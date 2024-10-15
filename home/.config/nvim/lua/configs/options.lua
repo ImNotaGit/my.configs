@@ -5,16 +5,16 @@ local o = vim.o
 local config_path = vim.fn.stdpath "config" .. "/"
 
 -- backup files
-o.backupdir = "~/.nvim/backup//"
+o.backupdir = vim.fn.expand("~/.nvim/backup")
 o.backup = true
 -- vimviews
-o.viewdir = "~/.nvim/views//"
+o.viewdir = vim.fn.expand("~/.nvim/views")
 -- swap files
-o.directory = "~/.nvim/swap//"
+o.directory = vim.fn.expand("~/.nvim/swap")
 -- viminfo stores the the state of your previous editing session
-o.viminfo = vim.o.viminfo .. ",n~/.nvim/viminfo"
+o.viminfo = vim.o.viminfo .. ",n" .. vim.fn.expand("~/.nvim/viminfo")
 -- undofile - This allows you to use undos after exiting and restarting
-o.undodir = "~/.nvim/undo//"
+o.undodir = vim.fn.expand("~/.nvim/undo")
 o.undofile = true
 
 o.cursorlineopt ="both"
