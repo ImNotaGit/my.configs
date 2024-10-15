@@ -1,0 +1,18 @@
+[credential]
+	helper = cache
+[color]
+	ui = true
+[alias]
+	st = status
+	co = checkout
+	ci = commit
+	br = branch
+	unstage = reset HEAD
+[user]
+	name = Kuoyuan Cheng
+	email = cheng.ky@hotmail.com
+[init]
+	defaultBranch = main
+[includeIf "gitdir:/home/user/snakemake_pipelines/"]
+    path = /home/user/snakemake_pipelines/.gitconfig_include
+	

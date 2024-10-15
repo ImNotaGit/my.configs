@@ -1,0 +1,24 @@
+#channel_alias: https://conda.anaconda.org
+
+default_channels:
+  - https://conda.anaconda.org/conda-forge
+  - https://conda.anaconda.org/anaconda
+  - https://conda.anaconda.org/bioconda
+  - https://conda.anaconda.org/r
+
+channels:
+  - https://conda.anaconda.org/conda-forge
+  - https://conda.anaconda.org/anaconda
+  - https://conda.anaconda.org/bioconda
+  - https://conda.anaconda.org/r
+  - defaults
+
+proxy_servers:
+  http: webproxy.company.com:8080
+  https: webproxy.company.com:8080
+
+#ssl_verify: False
+
+envs_dirs:
+  - /home/user/.conda/envs/mybase/envs
+  - /home/user/conda_envs

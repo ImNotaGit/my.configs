@@ -1,0 +1,75 @@
+---
+title: ""
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+  html_document:
+    css: R/x86_64-pc-linux-gnu-library/4.2/kableExtra/lightable-0.0.1/lightable.css
+    dev: png
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    toc_depth: 3
+    number_sections: false
+    theme: lumen
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, dev="png", dev.args=list(type="cairo"))
+```
+
+```{css, echo=FALSE}
+.main-container {
+  margin-left: 50px;
+  margin-right: 50px;
+  max-width: 100% !important;
+}
+
+.dataTables_scroll table {
+    width: 100% !important;
+    margin: auto;
+}
+
+.dataTables_scrollHeadInner{
+    width: 100% !important;
+}
+```
+
+```{r}
+suppressPackageStartupMessages({
+  library(my.utils)
+  library(data.table)
+  library(stringr)
+  library(magrittr)
+  library(kableExtra)
+  library(DT)
+  library(ggplot2)
+})
+options(bitmapType="cairo")
+options(width=180)
+options(warn=1)
+```
+
+```{r, include=FALSE}
+# init step to make sure that the dependencies are loaded
+htmltools::tagList(datatable(data.table(1,2), width="100%", rownames=FALSE, extensions=c("Buttons","FixedColumns"), options=list(autoWidth=TRUE, pageLength=1, lengthMenu=c(1,2), dom="Blftip", scrollX=TRUE, buttons=c("copy","csv","excel"), fixedColumns=list(leftColumns=1))))
+```
+
+## 
+
+```{r}
+kable(, "html") %>% kable_classic(full_width=FALSE, position="left")
+```
+
+```{r, fig.width=, fig.height=}
+
+```
+
+## {.tabset}
+
+```{r, results='asis'}
+for () {
+  cat(sprintf("### %s\n\n", ))
+}
+```
+
