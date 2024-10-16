@@ -32,7 +32,8 @@ options(radian.auto_indentation = TRUE)
 options(radian.tab_size = 2)
 
 # pop up completion while typing
-options(radian.complete_while_typing = TRUE)
+# according to https://github.com/randy3k/radian/issues/231, disabling this will solve the issue of prompt not at bottom of screen
+options(radian.complete_while_typing = FALSE)
 # the minimum length of prefix to trigger auto completions
 options(radian.completion_prefix_length = 2)
 # timeout in seconds to cancel completion if it takes too long

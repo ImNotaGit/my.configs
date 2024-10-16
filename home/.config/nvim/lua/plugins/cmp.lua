@@ -10,7 +10,7 @@ return {
     opts = function()
       dofile(vim.g.base46_cache .. "cmp")
       local cmp = require("cmp")
-      return {
+      local options = {
         preselect = cmp.PreselectMode.None,
         completion = {
           completeopt="menu,menuone,noinsert,noselect",
@@ -61,11 +61,20 @@ return {
             elseif cmp.visible() then
               cmp.select_next_item({ behavior = cmp.SelectBehavior.Insert })
             elseif require("luasnip").expand_or_jumpable() then
-              vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-expand-or-jump", true, true, true), "")
+              require("luasnip").expand_or_jump()
             else
               fallback()
             end
-          end, {"i","c"}),
+          end, { "i", "c" }),
+          ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
+            elseif require("luasnip").jumpable(-1) then
+              require("luasnip").jump(-1)
+            else
+              fallback()
+            end
+          end, { "i", "c" }),
         },
         sources = cmp.config.sources({
           { name = "copilot", keyword_length=0 },
@@ -103,6 +112,7 @@ return {
           },
         },
       }
+      return vim.tbl_deep_extend("force", options, require "nvchad.cmp")
     end,
     config = function(_, opts)
       local cmp = require("cmp")
@@ -111,7 +121,7 @@ return {
       cmp.setup.cmdline({ '/', '?' }, {
         mapping = cmp.mapping.preset.cmdline(),
         sources = {
-          { name = 'buffer' },
+          { name = "buffer" },
         },
       })
       -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).

@@ -22,7 +22,7 @@ return {
         "lemminx",
         "perlnavigator",
         "pylsp",
-        "r_language_server",
+        -- "r_language_server", -- prefer Nvim-R
         "vimls",
         "yamlls",
       }
