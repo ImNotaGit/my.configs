@@ -2,9 +2,11 @@ return {
 
   {
     "hrsh7th/nvim-cmp",
+    event = { "InsertEnter", "CmdlineEnter" },
     dependencies = {
       {
         "FelipeLema/cmp-async-path",
+        "hrsh7th/cmp-cmdline",
       }
     },
     opts = function()
@@ -17,64 +19,79 @@ return {
         },
         mapping = {
           -- trigger menu
-          ['<C-Space>'] = cmp.mapping({
+          ['<C-Space>'] = {
             i = cmp.mapping.complete(),
             c = cmp.mapping.complete(),
-          }),
+          },
           -- select items in completion list; below is the only way that I could make it work in multiple modes w/o messing up mappings outside of cmp
-          ["<Up>"] = cmp.mapping({
+          ["<Up>"] = {
             i = cmp.mapping.select_prev_item(),
             c = cmp.mapping.select_prev_item(),
-          }),
-          ["<Down>"] = cmp.mapping({
+          },
+          ["<Down>"] = {
             i = cmp.mapping.select_next_item(),
             c = cmp.mapping.select_next_item(),
-          }),
+          },
           -- scroll documentation up and down
           ["<C-u>"] = cmp.mapping.scroll_docs(-4),
           ["<C-d>"] = cmp.mapping.scroll_docs(4),
-          -- confirm completion; in insert mode only confirm expicitly selected item
-          ["<CR>"] = cmp.mapping({
+          -- confirm completion; only confirm expicitly selected item
+          ["<CR>"] = cmp.mapping(function(fallback)
+            if cmp.visible() and cmp.get_active_entry() then
+              cmp.confirm({ select = false })
+            else
+              fallback()
+            end
+          end, { "i", "c" }),
+          -- abort completion with Alt+Backspace
+          ["<M-BS>"] = {
+            i = cmp.mapping.abort(),
+            c = cmp.mapping.abort(),
+          },
+          -- close completion list
+          ["<C-e>"] = {
+            i = cmp.mapping.close(),
+            c = cmp.mapping.close(),
+          },
+          -- use Tab for Copilot completion when Copilot suggestion is visible, but otherwise fall back to default Tab behavior
+          ["<Tab>"] = {
             i = function(fallback)
-              if cmp.visible() and cmp.get_active_entry() then
-                cmp.confirm({ select = false })
+              if require("copilot.suggestion").is_visible() then
+                require("copilot.suggestion").accept()
+              elseif cmp.visible() then
+                cmp.select_next_item({ behavior = cmp.SelectBehavior.Insert })
+              elseif require("luasnip").expand_or_jumpable() then
+                require("luasnip").expand_or_jump()
               else
                 fallback()
               end
             end,
-            c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false }),
-          }),
-          -- abort completion with Alt+Backspace
-          ["<M-BS>"] = cmp.mapping({
-            i = cmp.mapping.abort(),
-            c = cmp.mapping.abort(),
-          }),
-          -- close completion list
-          ["<C-e>"] = cmp.mapping({
-            i = cmp.mapping.close(),
-            c = cmp.mapping.close(),
-          }),
-          -- use Tab for Copilot completion when Copilot suggestion is visible, but otherwise fall back to default Tab behavior
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            if require("copilot.suggestion").is_visible() then
-              require("copilot.suggestion").accept()
-            elseif cmp.visible() then
-              cmp.select_next_item({ behavior = cmp.SelectBehavior.Insert })
-            elseif require("luasnip").expand_or_jumpable() then
-              require("luasnip").expand_or_jump()
-            else
-              fallback()
-            end
-          end, { "i", "c" }),
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
-            elseif require("luasnip").jumpable(-1) then
-              require("luasnip").jump(-1)
-            else
-              fallback()
-            end
-          end, { "i", "c" }),
+            c = function(fallback)
+              if cmp.visible() then
+                cmp.select_next_item({ behavior = cmp.SelectBehavior.Insert })
+              else
+                fallback()
+              end
+            end,
+          },
+          ["<S-Tab>"] = {
+            i = function(fallback)
+              if cmp.visible() then
+                cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
+              elseif require("luasnip").expand_or_jumpable() then
+                require("luasnip").expand_or_jump()
+              else
+                fallback()
+              end
+            end,
+            c = function(fallback)
+              if cmp.visible() then
+                cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
+              else
+                fallback()
+              end
+            end,
+          },
         },
         sources = cmp.config.sources({
           { name = "copilot", keyword_length=0 },
@@ -91,8 +108,6 @@ return {
           },
           { name = "nvim_lua" },
           { name = "async_path" },
-        }, {
-          { name = "cmdline" },
         }),
         sorting = {
           priority_weight = 2,
@@ -119,16 +134,14 @@ return {
       cmp.setup(opts)
       -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
       cmp.setup.cmdline({ '/', '?' }, {
-        mapping = cmp.mapping.preset.cmdline(),
         sources = {
           { name = "buffer" },
         },
       })
       -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
       cmp.setup.cmdline(':', {
-        mapping = cmp.mapping.preset.cmdline(),
         sources = cmp.config.sources({
-          { name = "cmdline" }
+          { name = "cmdline" },
         }, {
           { name = "async_path" }
         }),

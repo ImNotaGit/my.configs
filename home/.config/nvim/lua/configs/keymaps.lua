@@ -12,6 +12,23 @@ map("v", "<CR>", "}", { desc = "further select next paragraph or block" })
 map("v", "<M-j>", "dp", { desc = "move line down 1 line" })
 map("v", "<M-k>", "dkP", { desc = "move line up 1 line" })
 map("v", "u", "", { desc = "disable change to lower case in visual mode" })
+map("n", "<C-p>", "<C-w>p", { desc = "go to previous window" })
+
+-- in terminal window insert mode, <C-k>/<C-p> to go up/to previous window (I usually have the terminal in the bottom)
+-- for some reason a simple map w/o autocmd, or mapping to e.g. "<Esc><C-w>k" does not work...
+autocmd({"BufWinEnter", "WinEnter"}, {
+  pattern = "term://*",
+  callback = function()
+    map("t", "<C-k>", function()
+      vim.cmd("stopinsert")
+      vim.cmd("wincmd k")
+    end, { buffer = 0, noremap = true, desc = "go to window above" })
+    map("t", "<C-p>", function()
+      vim.cmd("stopinsert")
+      vim.cmd("wincmd p")
+    end, { buffer = 0, noremap = true, desc = "go to previous window" })
+  end,
+})
 
 -- in Rmd, insert new code chunk or break current code chunk into two; the mapping behavior may change with different editor settings or plugins installed (?), so it could be non-robust...
 autocmd("FileType", {

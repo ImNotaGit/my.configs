@@ -75,12 +75,10 @@ return {
       -- without this line below, treesitter somehow would not use the proper gcc in $PATH, which will lead to errors
       require("nvim-treesitter.install").compilers = { "gcc" }
       -- parser-specific options
-      local parser_configs = require("nvim-treesitter.parsers").get_parser_configs()
-      -- parser_configs.markdown = {
-      --   filetype = { "markdown", "rmd" } -- not sure if I can pass an array
-      -- }
+      -- local parser_configs = require("nvim-treesitter.parsers").get_parser_configs()
+      -- parser_configs.markdown.filetype = { "markdown", "rmd" } -- this didn't work, not sure what the correct way is
       require("nvim-treesitter.configs").setup(opts)
-      -- use the markdown parser for rmd; I did not have to specify this before, but somehow now in rmd files treesitter is not enabled
+      -- use the markdown parser for rmd
       vim.treesitter.language.register("markdown", { "markdown", "rmd" })
       -- set conceal level to 0 to avoid unexpected code display issues
       vim.g.conceallevel = 0

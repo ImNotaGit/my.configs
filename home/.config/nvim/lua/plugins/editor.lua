@@ -30,6 +30,93 @@ return {
     end,
   },
 
+  -- fzf for telescope
+  {
+    "nvim-telescope/telescope-fzf-native.nvim",
+    build="make",
+  },
+
+  -- file browser for telescope
+  {
+    "nvim-telescope/telescope-file-browser.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+  },
+
+  -- change telescope (fuzzy finder) options
+  {
+    "nvim-telescope/telescope.nvim",
+    lazy = false,
+    opts = function()
+      dofile(vim.g.base46_cache .. "telescope")
+      local actions = require("telescope.actions")
+      local fb_actions = require("telescope").extensions.file_browser.actions
+      -- I copied the defaults and extensions_list from NvChad config; I needed to do this because I needed opts as a function to declare local fb_actions above to customize key mappings for the file_browser extension (otherwise, if I require the fb_actions inline in the mappings the extension could not be found)
+      return {
+        defaults = {
+          prompt_prefix = "   ",
+          selection_caret = " ",
+          entry_prefix = " ",
+          sorting_strategy = "ascending",
+          layout_config = {
+            horizontal = {
+              prompt_position = "top",
+              preview_width = 0.55,
+            },
+            width = 0.87,
+            height = 0.80,
+          },
+          mappings = {
+            n = { ["q"] = actions.close },
+          },
+        },
+        extensions_list = { "themes", "terms" },
+        pickers = {
+          find_files = {
+            find_command = { "find", ".", "..", "../..", "-type", "f" }, -- for find_files, include files in the parent and grandparent dir
+            mappings = {
+              i = {
+                ["<M-CR>"] = actions.select_vertical,
+              },
+            },
+          },
+          oldfiles = {
+            mappings = {
+              i = {
+                ["<M-CR>"] = actions.select_vertical,
+              },
+            },
+          },
+        },
+        extensions = {
+          file_browser = {
+            mappings = {
+              i = {
+                ["<C-h>"] = fb_actions.goto_home_dir,
+                ["<M-CR>"] = actions.select_vertical,
+              },
+            },
+          },
+        },
+      }
+    end,
+    config = function(_, opts)
+      require("telescope").setup(opts)
+      require("telescope").load_extension("fzf")
+      require("telescope").load_extension("file_browser")
+    end,
+    keys = {
+      { mode={"n"}, "<Leader><Space>", ":Telescope file_browser<CR>" },
+    },
+  },
+
+  -- change nvim-tree (file browser) options
+  {
+    "nvim-tree/nvim-tree.lua",
+    keys = {
+      { mode={"n"}, "<C-g>", require("nvim-tree.api").tree.change_root_to_parent }, -- change root to parent dir
+    },
+  },
+
   -- extended a/i textobjects
   {
     "echasnovski/mini.ai",

@@ -8,9 +8,8 @@ local M = {}
 M.base46 = {
   theme = "jellybeans",
   hl_override = {
-    -- ["@comment"] = { italic = true },
-    -- Comment = { italic = true, fg = "#7f7f7f", bg = "#1a1a1a" }, -- somehow italic has no effect but when it's there (regardless of true/false), the fg and bg colors got reversed
-    Comment = { fg = "#7f7f7f", bg = "#1a1a1a" },
+    ["@comment"] = { italic = false, fg = "#7f7f7f", bg = "#1a1a1a" },
+    Comment = { italic = false, fg = "#7f7f7f", bg = "#1a1a1a" }, -- somehow italic has no effect but reverses the fg and bg colors
     CursorLine = {bg = "#262626" },
     CursorColumn = { bg = "#262626" },
     WinSeparator = { fg = "#b3b3b3" },
