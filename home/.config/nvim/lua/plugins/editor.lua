@@ -33,19 +33,21 @@ return {
   -- fzf for telescope
   {
     "nvim-telescope/telescope-fzf-native.nvim",
+    cmd = "Telescope",
     build="make",
   },
 
   -- file browser for telescope
   {
     "nvim-telescope/telescope-file-browser.nvim",
+    cmd = "Telescope",
     dependencies = { "nvim-lua/plenary.nvim" },
   },
 
   -- change telescope (fuzzy finder) options
   {
     "nvim-telescope/telescope.nvim",
-    lazy = false,
+    cmd = "Telescope",
     opts = function()
       dofile(vim.g.base46_cache .. "telescope")
       local actions = require("telescope.actions")
@@ -109,9 +111,10 @@ return {
     },
   },
 
-  -- change nvim-tree (file browser) options
+  -- change nvim-tree (file browser) options; I have disabled this since I don't use it much
   {
     "nvim-tree/nvim-tree.lua",
+    enabled = false,
     keys = {
       { mode={"n"}, "<C-g>", require("nvim-tree.api").tree.change_root_to_parent }, -- change root to parent dir
     },
@@ -121,7 +124,27 @@ return {
   {
     "echasnovski/mini.ai",
     lazy = false,
-    opts = {},
+    opts = {
+      -- note: these custom text objects only work with i/a prefix during e.g. selection
+      custom_textobjects = {
+        -- refined definition of WORD: do not allow ',' in WORD
+        -- cannot distinguish between iW and aW, this is not important anyway
+        W = { { '[%s,]+[^%s,]+', '^%s*[^%s,]+' }, '^[%s,]*()().*()()$' },
+        -- a variation of the W above: starting right from the point of cursor (ignoring anything to the left)
+        E = { '[^%s,]+' },
+        -- modify ')', ']' to include leading word; for ')' allow the word to be valid function name; for ']' allow the word to be valid object name
+        [')'] = { { '[%s({]+[%w_.:$]+%b()', '^%s*[%w_.:$]+%b()' }, '^[%s({]*()().*()()$' },
+        [']'] = { { '[%s([{]+[%w_.$@]+%b[]', '^%s*[%w_.$@]+%b[]' }, '^[%s([{]*()().*()()$' },
+        -- ')' or ']'
+        B = { { '[%s({]+[%w_.:$]+%b()', '^%s*[%w_.:$]+%b()', '[%s([{]+[%w_.$@]+%b[]', '^%s*[%w_.$@]+%b[]' }, '^[%s([{]*()().*()()$' },
+        -- a variation of the B above: starting right from the point of cursor (ignoring anything to the left)
+        V = { { '[%w_.:$]+%b()', '[%w_.$@]+%b[]' } },
+      },
+      -- Number of lines within which textobject is searched
+      n_lines = 1,
+      search_method = "cover_or_nearest",
+      silent = true,
+    },
   },
 
   -- extend f, F, t, T to work on multiple lines, with repeated jumps (using ";")
@@ -143,10 +166,40 @@ return {
     end,
   },
 
+  -- move lines etc.
+  {
+    "fedepujol/move.nvim",
+    opts = {
+      -- enable moving (and auto indentation when applicable) for various text objects
+      line = { enable = true, indent = true },
+      block = { enable = true, indent = true },
+      word = { enable = true },
+      char = { enable = true },
+    },
+    keys = {
+      { mode = "n", "<A-j>", ":MoveLine(1)<CR>", noremap = true, silent = true },
+      { mode = "n", "<A-k>", ":MoveLine(-1)<CR>", noremap = true, silent = true },
+      { mode = "n", "<A-h>", ":MoveHChar(-1)<CR>", noremap = true, silent = true }, -- this got overridden by NvChad defaults, I had to add this to ../configs/keymaps.lua as well
+      { mode = "n", "<A-l>", ":MoveHChar(1)<CR>", noremap = true, silent = true },
+      { mode = "n", "<A-.>", ":MoveWord(1)<CR>", noremap = true, silent = true },
+      { mode = "n", "<A-,>", ":MoveWord(-1)<CR>", noremap = true, silent = true },
+      { mode = "i", "<A-j>", "<Cmd>MoveLine(1)<CR>", noremap = true, silent = true },
+      { mode = "i", "<A-k>", "<Cmd>MoveLine(-1)<CR>", noremap = true, silent = true },
+      { mode = "i", "<A-h>", "<Cmd>MoveHChar(-1)<CR>", noremap = true, silent = true },
+      { mode = "i", "<A-l>", "<Cmd>MoveHChar(1)<CR>", noremap = true, silent = true },
+      { mode = "i", "<A-.>", "<Cmd>MoveWord(1)<CR>", noremap = true, silent = true },
+      { mode = "i", "<A-,>", "<Cmd>MoveWord(-1)<CR>", noremap = true, silent = true },
+      { mode = "v", "<A-j>", ":MoveBlock(1)<CR>", noremap = true, silent = true },
+      { mode = "v", "<A-k>", ":MoveBlock(-1)<CR>", noremap = true, silent = true },
+      { mode = "v", "<A-h>", ":MoveHBlock(-1)<CR>", noremap = true, silent = true },
+      { mode = "v", "<A-l>", ":MoveHBlock(1)<CR>", noremap = true, silent = true },
+    }
+  },
+
   -- enable common vim keybindings in terminal
   {
     "chomosuke/term-edit.nvim",
-    lazy = false,
+    event = {event={"BufWinEnter", "WinEnter"}, pattern="term://*"},
     config = function()
       require("term-edit").setup({
         prompt_end = {'%$ ', '> '},
@@ -205,8 +258,7 @@ return {
   -- nvim-autopairs (used by NvChad by default) did not work perfectly out of the box, and I was not sure how to customize it, so I used ultimate-autopair.nvim which worked for me out of the box; this does not seem to conflict with nvim-autopairs
   {
     "altermo/ultimate-autopair.nvim",
-    -- event = { "InsertEnter", "CmdlineEnter" },
-    event = { "InsertEnter" },
+    event = { "InsertEnter", "CmdlineEnter" },
     branch = "v0.6", --recomended as each new version will have breaking changes
     opts = {}, -- this line is needed
     -- I tried to enable the experimental terminal mode autopair but it failed
@@ -223,50 +275,58 @@ return {
   -- shortcuts for editing brackets etc.
   {
     "kylechui/nvim-surround",
-    lazy = false,
     opts = {
       keymaps = {
         insert = "<C-s>", -- doesn't work; the default also doesn't work...
         normal = "s",
         normal_cur = "sl", -- for current line
+        visual = "s",
       },
     },
     keys = {
       -- surround word
-      {mode = "n", 's"', 'siw"', remap = true},
-      {mode = "n", "s'", "siw'", remap = true},
-      {mode = "n", "s`", "siw`", remap = true},
-      {mode = "n", "s)", "siw)", remap = true},
-      {mode = "n", "s]", "siw]", remap = true},
-      {mode = "n", "s}", "siw}", remap = true},
-      -- surround WORD (word until space; caveat: e.g. trailing , will be included)
-      {mode = "n", 'ss"', 'siW"', remap = true},
-      {mode = "n", "ss'", "siW'", remap = true},
-      {mode = "n", "ss`", "siW`", remap = true},
-      {mode = "n", "ss)", "siW)", remap = true},
-      {mode = "n", "ss]", "siW]", remap = true},
-      {mode = "n", "ss}", "siW}", remap = true},
-      -- surround word starting from cursor in insert mode; for quotes end after last quote; for brackets end before the last bracket
-      {mode = "i", '""s', '<Esc>sw"lwa', remap = true},
-      {mode = "i", "''s", "<Esc>sw'lwa", remap = true},
-      {mode = "i", "``s", "<Esc>sw`lwa", remap = true},
-      {mode = "i", "()s", "<Esc>sw)lwi", remap = true},
-      {mode = "i", "[]s", "<Esc>sw]lwi", remap = true},
-      {mode = "i", "{}s", "<Esc>sw}lwi", remap = true},
-      -- surround WORD starting from cursor in insert mode, ditto
-      {mode = "i", '""w', '<Esc>sW"Ea', remap = true},
-      {mode = "i", "''w", "<Esc>sW'Ea", remap = true},
-      {mode = "i", "``w", "<Esc>sW`Ea", remap = true},
-      {mode = "i", "()w", "<Esc>sW)Ei", remap = true},
-      {mode = "i", "[]w", "<Esc>sW]Ei", remap = true},
-      {mode = "i", "{}w", "<Esc>sW}Ei", remap = true},
+      { mode = "n", 's"', 'siw"', remap = true },
+      { mode = "n", "s'", "siw'", remap = true },
+      { mode = "n", "s`", "siw`", remap = true },
+      { mode = "n", "s)", "siw)", remap = true },
+      { mode = "n", "s]", "siw]", remap = true },
+      { mode = "n", "s}", "siw}", remap = true },
+      -- surround WORD (custom-defined via mini.ai)
+      { mode = "n", 'ss"', 'siW"', remap = true },
+      { mode = "n", "ss'", "siW'", remap = true },
+      { mode = "n", "ss`", "siW`", remap = true },
+      { mode = "n", "ss)", "siW)", remap = true },
+      { mode = "n", "ss]", "siW]", remap = true },
+      { mode = "n", "ss}", "siW}", remap = true },
+      -- surround B (custom-defined via mini.ai)
+      { mode = "n", "ss(", "siB)", remap = true },
+      { mode = "n", "ss[", "siB]", remap = true },
+      { mode = "n", "ss{", "siB}", remap = true },
+      -- surround word starting from cursor in insert mode; in the end the cursor is placed after the last quote or before the last bracket
+      { mode = "i", '""s', '<Esc>sw"lwa', remap = true },
+      { mode = "i", "''s", "<Esc>sw'lwa", remap = true },
+      { mode = "i", "``s", "<Esc>sw`lwa", remap = true },
+      { mode = "i", "()s", "<Esc>sw)lwi", remap = true },
+      { mode = "i", "[]s", "<Esc>sw]lwi", remap = true },
+      { mode = "i", "{}s", "<Esc>sw}lwi", remap = true },
+      -- surround WORD (the custom-defined 'E' text object via mini.ai) starting from cursor in insert mode
+      { mode = "i", '""w', '<Esc>siE"Ea', remap = true },
+      { mode = "i", "''w", "<Esc>siE'Ea", remap = true },
+      { mode = "i", "``w", "<Esc>siE`Ea", remap = true },
+      { mode = "i", "()w", "<Esc>siE)Ei", remap = true },
+      { mode = "i", "[]w", "<Esc>siE]Ei", remap = true },
+      { mode = "i", "{}w", "<Esc>siE}Ei", remap = true },
+      -- surround V (custom-defined via mini.ai) starting from cursor in insert mode
+      { mode = "i", "()b", "<Esc>siV)%i", remap = true },
+      { mode = "i", "[]b", "<Esc>siV]%i", remap = true },
+      { mode = "i", "{}b", "<Esc>siV}%i", remap = true },
       -- surround current line starting from cursor in insert mode; for {} assume it's a chunk so end with <CR> after the first bracelet (in R this will auto format into a chunk)
-      {mode = "i", '""l', '<Esc>s$"A', remap = true},
-      {mode = "i", "''l", "<Esc>s$'A", remap = true},
-      {mode = "i", "``l", "<Esc>s$`A", remap = true},
-      {mode = "i", "()j", "<Esc>s$)$i", remap = true}, -- change l to j as j is easier to type in the sequence
-      {mode = "i", "[]l", "<Esc>s$]$i", remap = true},
-      {mode = "i", "{}l", "<Esc>s$}a<CR>", remap = true},
+      { mode = "i", '""l', '<Esc>s$"A', remap = true },
+      { mode = "i", "''l", "<Esc>s$'A", remap = true },
+      { mode = "i", "``l", "<Esc>s$`A", remap = true },
+      { mode = "i", "()j", "<Esc>s$)$i", remap = true }, -- change l to j as j is easier to type in the sequence
+      { mode = "i", "[]l", "<Esc>s$]$i", remap = true },
+      { mode = "i", "{}l", "<Esc>s$}a<CR>", remap = true },
     },
     config = function(_, opts)
       require("nvim-surround").setup(opts)

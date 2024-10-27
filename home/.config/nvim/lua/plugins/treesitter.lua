@@ -1,5 +1,13 @@
 return {
 
+  -- treesitter text objects; for now I disable this with mini.ai satisfying my current needs
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    enabled = false,
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    opts = {},
+  },
+
   -- treesitter syntax parser
   {
     "nvim-treesitter/nvim-treesitter",

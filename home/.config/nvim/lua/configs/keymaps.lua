@@ -3,22 +3,46 @@ require "nvchad.mappings"
 local map = vim.keymap.set
 local autocmd = vim.api.nvim_create_autocmd
 
+-- note that <C-i> and <Tab>, <C-[> and <Esc>, <C-m> and <CR> are internally the same and cannot be distinguished, so avoid mapping to these combo keys.
+-- <Ctrl> + non-alphabetic cannot be mapped (although some can be mapped with <Alt>); <A-i> also cannot be mapped in my terminal for some reason
+
+-- a reminder of commonly used mappings set by NvChad
+-- i, C-j/k/h/l: move around
+-- i, C-b/e: go to beginning/end of line
+-- n, C-j/k/h/l: go to window above/below/left/right
+
+-- various insert mode mappings; note that <C-o> is temporary exit insert mode
 map("i", "jk", "<Esc>", { desc = "exit insert mode" })
+map("i", "<C-a>", "<C-o>^", { desc = "go to beginning of line" })
+map("i", "<C-y>", "<C-o>b", { desc = "go to start of previous word" })
+map("i", "<C-u>", "<C-o>w", { desc = "go to start of next word" })
+map("i", "<C-f>", "<C-o>f", { desc = "go to next occurence of character" })
+map("i", "<C-d>", "<C-o>F", { desc = "go to previous occurence of character" })
+map("i", ";;", "<C-o>;", { desc = "repeat f/F" })
+map("i", "%$", "<C-o>%<Right>", { desc = "go to left matching bracket" })
+
+-- NvChad map <A-h> to toggle horizontal terminal, I change this to <C-t> and use <A-h> instead for moving character to left
+map({ "n", "t" }, "<A-h>", "")
+map("n", "<A-h>", ":MoveHChar(-1)<CR>", { noremap = true, silent = true } )
+map({ "n", "t" }, "<C-t>", function()
+  require("nvchad.term").toggle { pos = "sp", id = "htoggleTerm" }
+end, { desc = "terminal toggleable horizontal term" })
+
 map("n", "<Esc>", ":noh<CR>", { desc = "clear highlights", noremap = true }) -- this mapping is NvChad default but I need to specify noremap=true
 map("n", "<CR>", "{lv}", { desc = "select paragraph or block" })
-map("n", "<M-j>", "ddp", { desc = "move line down 1 line" })
-map("n", "<M-k>", "ddkP", { desc = "move line up 1 line" })
 map("v", "<CR>", "}", { desc = "further select next paragraph or block" })
-map("v", "<M-j>", "dp", { desc = "move line down 1 line" })
-map("v", "<M-k>", "dkP", { desc = "move line up 1 line" })
-map("v", "u", "", { desc = "disable change to lower case in visual mode" })
+map("v", "u", "") -- disable change to lower case in visual mode
 map("n", "<C-p>", "<C-w>p", { desc = "go to previous window" })
+map("v", "x", "di", { desc = "selete select then enter insert mode" })
 
--- in terminal window insert mode, <C-k>/<C-p> to go up/to previous window (I usually have the terminal in the bottom)
+-- in terminal window insert mode, jk to exit insert, <C-k>/<C-p> to go up/to previous window (I usually have the terminal in the bottom)
 -- for some reason a simple map w/o autocmd, or mapping to e.g. "<Esc><C-w>k" does not work...
 autocmd({"BufWinEnter", "WinEnter"}, {
   pattern = "term://*",
   callback = function()
+    map("t", "jk", function()
+      vim.cmd("stopinsert")
+    end, { buffer = 0, noremap = true, desc = "exit terminal insert mode" })
     map("t", "<C-k>", function()
       vim.cmd("stopinsert")
       vim.cmd("wincmd k")
@@ -47,6 +71,6 @@ autocmd("FileType", {
   callback = function()
     vim.api.nvim_buf_set_keymap(0, "i", ".. ", " %>% ", { noremap =true })
     vim.api.nvim_buf_set_keymap(0, "i", "..<CR>", " %>%<CR>", { noremap =true })
-    vim.api.nvim_buf_set_keymap(0, "i", "--", " <- ", { noremap =true })
+    vim.api.nvim_buf_set_keymap(0, "i", "_ ", " <- ", { noremap =true })
   end,
 })
