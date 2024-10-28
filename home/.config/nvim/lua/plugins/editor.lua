@@ -33,14 +33,12 @@ return {
   -- fzf for telescope
   {
     "nvim-telescope/telescope-fzf-native.nvim",
-    cmd = "Telescope",
     build="make",
   },
 
   -- file browser for telescope
   {
     "nvim-telescope/telescope-file-browser.nvim",
-    cmd = "Telescope",
     dependencies = { "nvim-lua/plenary.nvim" },
   },
 
