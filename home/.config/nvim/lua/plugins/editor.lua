@@ -3,7 +3,7 @@ return {
   -- remember last edit position
   {
     "vladdoster/remember.nvim",
-    lazy = false,
+    event = "VeryLazy",
     opts = {},
   },
 
@@ -121,7 +121,7 @@ return {
   -- extended a/i textobjects
   {
     "echasnovski/mini.ai",
-    lazy = false,
+    event = "VeryLazy",
     opts = {
       -- note: these custom text objects only work with i/a prefix during e.g. selection
       custom_textobjects = {
@@ -148,14 +148,14 @@ return {
   -- extend f, F, t, T to work on multiple lines, with repeated jumps (using ";")
   {
     "echasnovski/mini.jump",
-    lazy = false,
+    event = "VeryLazy",
     opts = {},
   },
 
   -- fast searching and jumping to text
   {
     "ggandor/leap.nvim",
-    lazy = false,
+    event = "VeryLazy",
     config = function()
       -- the default maps key "s", which I use for surround, so I uses "t" instead (I don't use the default "t" key for jumping)
       vim.keymap.set({"n", "x", "o"}, "t",  "<Plug>(leap-forward)")
@@ -167,6 +167,7 @@ return {
   -- move lines etc.
   {
     "fedepujol/move.nvim",
+    event = "VeryLazy",
     opts = {
       -- enable moving (and auto indentation when applicable) for various text objects
       line = { enable = true, indent = true },
@@ -208,7 +209,7 @@ return {
   -- color brackets etc.
   {
     "HiPhish/rainbow-delimiters.nvim",
-    lazy = false,
+    event = "VeryLazy",
     config = function()
       local rainbow_delimiters = require 'rainbow-delimiters'
       vim.g.rainbow_delimiters = {
@@ -273,6 +274,7 @@ return {
   -- shortcuts for editing brackets etc.
   {
     "kylechui/nvim-surround",
+    event = "VeryLazy",
     opts = {
       keymaps = {
         insert = "<C-s>", -- doesn't work; the default also doesn't work...
@@ -334,7 +336,7 @@ return {
   -- adding comments
   {
     "numToStr/Comment.nvim",
-    lazy = false,
+    event = "VeryLazy",
     opts = {
       -- lhs of toggle mappings in normal mode
       toggler = {
