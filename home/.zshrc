@@ -49,38 +49,29 @@ ENABLE_CORRECTION="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-#plugins=(vi-mode zsh-autopair zsh-autocomplete git)
-plugins=(vi-mode zsh-autopair git)
-
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
+#plugins=(vi-mode zsh-autopair zsh-autocomplete git-prompt)
+plugins=(zsh-autopair zsh-autocomplete git-prompt)
 
 # set $TERM
 export TERM=xterm-256color
 
+# this is to make zsh-autocomplete not show autocomplete menu unless the user triggers it with Tab, etc.; this needs to be before sourcing zsh-autocomplete (i.e. via oh-my-zsh.sh)
+# zstyle ':autocomplete:async' enabled no
+
+# load oh-my-zsh
 source $ZSH/oh-my-zsh.sh
 
-# set a fancy prompt (non-color, unless we know we "want" color)
-case "$TERM" in
-    xterm-color | xterm-256color ) color_prompt=yes;;
-esac
-
 # color prompt
-if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}%n@%m: %F{012}%~%f %{$fg[magenta]%}$(git_prompt_info)'$'\n''%{$fg_bold[yellow]%}%B$%b%{$reset_color%} '
-else
-    PS1='${debian_chroot:+($debian_chroot)}%n@%m: %d'$'\n''%# '
-fi
-unset color_prompt
+PS1='${debian_chroot:+($debian_chroot)}%n@%m: %F{012}%~%f %{$reset_color%}$(git_super_status)'$'\n''%{$fg_bold[yellow]%}%B$%b%{$reset_color%} '
+# by default git-prompt (i.e. $(git_super_status)) is placed to the right, instead I make it part of the main prompt and reset RPROMPT
+RPROMPT=''
 
 
-### Settings for plugins
+### Settings for plugins and tools
 
 # vi-mode
-VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
-VI_MODE_SET_CURSOR=true
+# change cursor shape depending on vi mode
+# VI_MODE_SET_CURSOR=true
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -88,44 +79,40 @@ export FZF_DEFAULT_COMMAND="find ./ $mypr -not \( -path $mypr/tmp -prune \) -not
 # -e: exact match
 export FZF_DEFAULT_OPTS='-e --height=50%'
 
-# # zsh-autocomplete
-# # this is to make zsh-autocomplete not show autocomplete menu unless the user triggers it with Tab, etc.; this needs to be before sourcing zsh-autocomplete (i.e. via oh-my-zsh.sh)
-# zstyle ':autocomplete:async' enabled no
-# # make Tab go directly to completion menu and cycle there
-# bindkey '\t' menu-select "$terminfo[kcbt]" menu-select
-# bindkey -M menuselect '\t' menu-complete "$terminfo[kcbt]" reverse-menu-complete
-# # Enter to directly execute command
-# bindkey -M menuselect '\r' .accept-line
+# zsh-autocomplete and other completion settings
+# make Tab go directly to completion menu and cycle there
+bindkey '\t' menu-select "$terminfo[kcbt]" menu-select
+bindkey -M menuselect '\t' menu-complete "$terminfo[kcbt]" reverse-menu-complete
+# Enter to directly execute command
+bindkey -M menuselect '\r' .accept-line
 # Esc to abort
-# bindkey -M menuselect '^[' send-break
+bindkey -M menuselect '^[' send-break
 # Backspace to undo completion
-# bindkey -M menuselect '^?' undo
-# # use cdr for recent folders
-# autoload -Uz cdr
-# # reset default zsh behaviors of up and down for command history (i.e. do not use zsh-autocomplete for command history)
-# bindkey '^[OA' up-line-or-history
-# bindkey '^[OB' down-line-or-history
-# # fix breaking of up and down in zsh-autocomplete command history with vi-mode
-# # bindkey -M main '^[OA' up-line-or-search
-# # bindkey -M isearch '^[OA' up-history
-# # bindkey -M menuselect '^[OA' up-history
-# # bindkey -M main '^[OB' down-line-or-select
-# # bindkey -M isearch '^[OB' down-history
-# # bindkey -M menuselect '^[OB' down-history
-# # left and right just for moving cursor
-# bindkey -M menuselect '^[OD' .backward-char
-# bindkey -M menuselect '^[OC'  .forward-char
+bindkey -M menuselect '^?' undo
+# use cdr for recent folders
+autoload -Uz cdr
+# reset default zsh behaviors of up and down for command history (i.e. do not use zsh-autocomplete for command history)
+bindkey '^[OA' up-line-or-history
+bindkey '^[OB' down-line-or-history
+# fix breaking of up and down in zsh-autocomplete command history with vi-mode
+# bindkey -M main '^[OA' up-line-or-search
+# bindkey -M isearch '^[OA' up-history
+# bindkey -M menuselect '^[OA' up-history
+# bindkey -M main '^[OB' down-line-or-select
+# bindkey -M isearch '^[OB' down-history
+# bindkey -M menuselect '^[OB' down-history
+# left and right just for moving cursor
+bindkey -M menuselect '^[OD' .backward-char
+bindkey -M menuselect '^[OC'  .forward-char
 # hide files matching specific patterns unless you type something that matches only those file
-zstyle ':completion:*files' ignored-patterns '*.'{RDS,RData,xls,xlsx,pdf,png,html} '*-pratend'
-# # hide warning messages
-# zstyle ':completion:*:warnings' format ''
-# # re-enable a/b/c -> abc/bcd/cde autocompletion
-# zstyle ':completion:*:paths' path-completion yes
-
-
-### Completion settings
-
-# Ctrl-Backspace to undo completion; if I set this simply to Backspace, deleting character will stop working after a whole-line autocompletion is accepted
+zstyle ':completion:*:*:(less|le|vi|vim|nvim):*' ignored-patterns '*.'{RDS,RData,xls,xlsx,pdf,png,html} '*-pratend'
+# disable autocompletion at command position (this includes commands, aliases, functions, etc.)
+zstyle ':completion:*:-command-:*' ignored-patterns '*'
+# hide warning messages
+zstyle ':completion:*:warnings' format ''
+# re-enable a/b/c -> abc/bcd/cde autocompletion
+zstyle ':completion:*:paths' path-completion yes
+# Ctrl-Backspace to undo completion (works even after a completion has been confirmed and completion menu is not being displayed); if I set this simply to Backspace, deleting character will stop working after a whole-line autocompletion is accepted
 bindkey '^H' undo
 # press only a single tab to do partial completion and show further completion suggestions
 unsetopt listambiguous
@@ -171,7 +158,7 @@ alias ma='module add'
 alias mr='module rm'
 alias mls='module list'
 alias mav='module avail'
-alias r='module add R/4.2.1'
+alias r='module add R/4.4.1'
 alias rr='module rm R'
 alias ra=radian
 alias ca='conda activate'
