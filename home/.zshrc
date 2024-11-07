@@ -73,12 +73,6 @@ RPROMPT=''
 # change cursor shape depending on vi mode
 # VI_MODE_SET_CURSOR=true
 
-# fzf
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export FZF_DEFAULT_COMMAND="find ./ $mypr -not \( -path $mypr/tmp -prune \) -not \( -name .snakemake -prune \) -not \( -name .snakemake_cluster_status -prune \)"
-# -e: exact match
-export FZF_DEFAULT_OPTS='-e --height=50%'
-
 # zsh-autocomplete and other completion settings
 # make Tab go directly to completion menu and cycle there
 bindkey '\t' menu-select "$terminfo[kcbt]" menu-select
@@ -182,6 +176,8 @@ export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 # may need to manually set language environment
 #export LANG=en_US.UTF-8
 
+export pr=$HOME/projects
+
 export SGE_LONG_JOB_NAMES=-1
 export NXF_HOME=$HOME/.nextflow
 export NXF_SINGULARITY_CACHEDIR=$HOME/.nextflow/singularity
@@ -195,3 +191,10 @@ export BCFTOOLS_PLUGINS=$HOME/bcftools-1.14/libexec/bcftools
 # !! Contents within this block are managed by 'conda init' !!
 # ...
 # <<< conda initialize <<<
+
+# fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export FZF_DEFAULT_COMMAND="find ./ $pr -not \( -path $pr/tmp -prune \) -not \( -name .snakemake -prune \) -not \( -name .snakemake_cluster_status -prune \)"
+# -e: exact match
+export FZF_DEFAULT_OPTS='-e --height=50%'
+

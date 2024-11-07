@@ -29,8 +29,8 @@ map({ "n", "t" }, "<C-t>", function()
 end, { desc = "terminal toggleable horizontal term" })
 
 map("n", "<Esc>", ":noh<CR>", { desc = "clear highlights", noremap = true }) -- this mapping is NvChad default but I need to specify noremap=true
-map("n", "<CR>", "{lv}", { desc = "select paragraph or block" })
-map("v", "<CR>", "}", { desc = "further select next paragraph or block" })
+map("n", "<CR>", "{lV}$h", { desc = "select paragraph or block" }) -- I need line-wise select to make pasting easier, $h to avoid selecting ending empty line while also accounting for end-of-file no empty line case
+map("v", "<CR>", "j}$h", { desc = "further select next paragraph or block" })
 map("v", "u", "") -- disable change to lower case in visual mode
 map("n", "<C-p>", "<C-w>p", { desc = "go to previous window" })
 map("v", "x", "di", { desc = "selete select then enter insert mode" })
