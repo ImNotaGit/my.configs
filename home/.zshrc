@@ -176,8 +176,6 @@ export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 # may need to manually set language environment
 #export LANG=en_US.UTF-8
 
-export pr=$HOME/projects
-
 export SGE_LONG_JOB_NAMES=-1
 export NXF_HOME=$HOME/.nextflow
 export NXF_SINGULARITY_CACHEDIR=$HOME/.nextflow/singularity
