@@ -50,6 +50,7 @@ return {
       dofile(vim.g.base46_cache .. "telescope")
       local actions = require("telescope.actions")
       local fb_actions = require("telescope").extensions.file_browser.actions
+      local actions_state = require("telescope.actions.state")
       -- I copied the defaults and extensions_list from NvChad config; I needed to do this because I needed opts as a function to declare local fb_actions above to customize key mappings for the file_browser extension (otherwise, if I require the fb_actions inline in the mappings the extension could not be found)
       return {
         defaults = {
@@ -72,7 +73,7 @@ return {
         extensions_list = { "themes", "terms" },
         pickers = {
           find_files = {
-            find_command = { "find", ".", "..", "../..", "-type", "f" }, -- for find_files, include files in the parent and grandparent dir
+            -- find_command = { "find", ".", "..", "-type", "f" }, -- for find_files, include files in the parent
             mappings = {
               i = {
                 ["<M-CR>"] = actions.select_vertical,
@@ -89,10 +90,19 @@ return {
         },
         extensions = {
           file_browser = {
+            grouped = true,
+            hidden = { file_browser = true, folder_browser = true },
             mappings = {
               i = {
                 ["<C-h>"] = fb_actions.goto_home_dir,
                 ["<M-CR>"] = actions.select_vertical,
+                -- initiate fzf search from the selected dir (assuming a dir is selected, not a file)
+                ["<C-f>"] = function(prompt_bufnr)
+                  local path = actions_state.get_selected_entry().value
+                  actions.close(prompt_bufnr)
+                  vim.cmd("FzfLua files cwd=" .. path)
+                  vim.cmd("startinsert")
+                end,
               },
             },
           },
@@ -105,7 +115,57 @@ return {
       require("telescope").load_extension("file_browser")
     end,
     keys = {
-      { mode={"n"}, "<Leader><Space>", ":Telescope file_browser<CR>" },
+      { mode={"n"}, "<Leader>fe", ":Telescope file_browser<CR>" },
+      { mode={"n"}, "<Leader>fE", ":Telescope file_browser path=" },
+    },
+  },
+
+  -- fzf fuzzy finder, I use this as a faster alternative to telescope but keep telescope for certain functions
+  {
+    "ibhagwan/fzf-lua",
+    -- optional for icon support
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    event = "VeryLazy",
+    opts = function()
+      local actions = require("fzf-lua.actions")
+      return {
+        fzf_colors = true,
+        winopts = {
+          height = 0.9,
+          width = 0.9,
+          row = 0.5,
+          col = 0.5,
+          preview = {
+            wrap = "wrap",
+            layout = "vertical",
+            vertical = "down:50%",
+          },
+        },
+        actions = {
+          files = {
+            ["enter"] = actions.file_edit,
+            ["alt-enter"] = actions.file_vsplit,
+          },
+        },
+        files = {
+          previewer = false,
+          cwd_prompt = false,
+          -- this find command option below exclude binary files with grep -I, but this is too slow
+          --find_opts = [[\( -type f -o -name .git -prune -o -name .hg -prune -o -name .work -prune -o -name '.snakemake*' -prune -o -name logs -prune -o -name tmp -prune \) -not -name .git -not -name .hg -not -name .work -not -name '.snakemake*' -not -name logs -not -name tmp -not -name '*.html' -not -name '*.xml' -not -name '*.xlsx' -exec grep -Iq '.' {} \; -printf '%P\n']],
+          find_opts = [[\( -type f -o -name .git -prune -o -name .hg -prune -o -name .work -prune -o -name '.snakemake*' -prune -o -name logs -prune -o -name tmp -prune \) -not -name .git -not -name .hg -not -name .work -not -name '.snakemake*' -not -name logs -not -name tmp -not -name '*.gz' -not -name '*.fastq*' -not -name '*.fq*' -not -name '*.bam*' -not -name '*.RDS' -not -name '*.RData' -not -name '*.png' -not -name '*.pdf' -not -name '*.html' -not -name '*.xml' -not -name '*.xlsx' -not -name DONE -printf '%P\n']],
+        },
+        grep = {
+          -- need \\ to escape
+          grep_opts = "--binary-files=without-match --line-number --recursive --color=auto --exclude={\\*.html,\\*.log,\\*.o,\\*.e} --exclude-dir={.git,.hg,.work,.snakemake\\*,logs,tmp} --perl-regexp -e",
+        },
+      }
+    end,
+    keys = {
+      { mode={"n"}, "<Leader>ff", ":FzfLua files<CR>" },
+      { mode={"n"}, "<Leader>fd", ":FzfLua files cwd=" },
+      { mode={"n"}, "<Leader>fo", ":FzfLua oldfiles<CR>" },
+      { mode={"n"}, "<Leader>fw", ":FzfLua live_grep<CR>" },
+      { mode={"n"}, "<Leader>fW", ":FzfLua live_grep cwd=" },
     },
   },
 

@@ -33,7 +33,7 @@ map("n", "<CR>", "{lV}$h", { desc = "select paragraph or block" }) -- I need lin
 map("v", "<CR>", "j}$h", { desc = "further select next paragraph or block" })
 map("v", "u", "") -- disable change to lower case in visual mode
 map("n", "<C-p>", "<C-w>p", { desc = "go to previous window" })
-map("v", "x", "di", { desc = "selete select then enter insert mode" })
+map("v", "x", "di", { desc = "delete select then enter insert mode" })
 
 -- in terminal window insert mode, jk to exit insert, <C-k>/<C-p> to go up/to previous window (I usually have the terminal in the bottom)
 -- for some reason a simple map w/o autocmd, or mapping to e.g. "<Esc><C-w>k" does not work...

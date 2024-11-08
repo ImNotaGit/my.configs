@@ -141,9 +141,9 @@ return {
       -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
       cmp.setup.cmdline(':', {
         sources = cmp.config.sources({
-          { name = "cmdline" },
+          { name = "async_path" }, -- path first
         }, {
-          { name = "async_path" }
+          { name = "cmdline" },
         }),
         matching = { disallow_symbol_nonprefix_matching = false },
       })

@@ -194,7 +194,20 @@ export BCFTOOLS_PLUGINS=$HOME/bcftools-1.14/libexec/bcftools
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export FZF_DEFAULT_COMMAND="find ./ $pr -not \( -path $pr/tmp -prune \) -not \( -name .snakemake -prune \) -not \( -name .snakemake_cluster_status -prune \)"
 # -e: exact match
 export FZF_DEFAULT_OPTS='-e --height=50%'
+# trigger with //<Tab>
+export FZF_COMPLETION_TRIGGER='//'
+# used for files after //<Tab>
+_fzf_compgen_path() {
+  find -L "$1" \
+    -name .git -prune -o -name .hg -prune -o -name '.snakemake*' -prune -o -name tmp -prune -o \( -type d -o -type f -o -type l \) \
+    -a -not -path "$1" -print 2> /dev/null
+}
+# used for dirs after cd //<Tab>
+_fzf_compgen_dir() {
+  find -L "$1" \
+    -name .git -prune -o -name .hg -prune -o -name '.snakemake*' -prune -o -name tmp -prune -o -type d \
+    -a -not -path "$1" -print 2> /dev/null
+}
 
