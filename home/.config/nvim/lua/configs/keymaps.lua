@@ -13,6 +13,7 @@ local autocmd = vim.api.nvim_create_autocmd
 
 -- various insert mode mappings; note that <C-o> is temporary exit insert mode
 map("i", "jk", "<Esc>", { desc = "exit insert mode" })
+map("i", "<A-BS>", "<C-w>", { desc = "delete word" })
 map("i", "<C-a>", "<C-o>^", { desc = "go to beginning of line" })
 map("i", "<C-y>", "<C-o>b", { desc = "go to start of previous word" })
 map("i", "<C-u>", "<C-o>w", { desc = "go to start of next word" })

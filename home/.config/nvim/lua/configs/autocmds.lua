@@ -20,7 +20,7 @@ autocmd({"BufNewFile", "BufRead"}, {
   command = "set filetype=bed",
 })
 
-autocmd({"BufNewFile", "BufRead"}, {
+autocmd({"BufNew", "BufNewFile", "BufRead"}, {
   pattern = "*",
   callback = function()
     -- do not automatically insert comment leader the next line of a current comment
@@ -69,6 +69,11 @@ autocmd("FileType", {
 })
 
 local template_path = vim.fn.stdpath "config" .. "/templates/"
+
+autocmd("BufNewFile", {
+  pattern = {"*.sh", "*.bash"},
+  command = "0r " .. template_path .. "template.bash",
+})
 
 autocmd("BufNewFile", {
   pattern = {"*.R", "*.r"},
