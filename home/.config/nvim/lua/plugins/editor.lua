@@ -3,7 +3,7 @@ return {
   -- remember last edit position
   {
     "vladdoster/remember.nvim",
-    event = "VeryLazy",
+    lazy = false,
     opts = {},
   },
 
