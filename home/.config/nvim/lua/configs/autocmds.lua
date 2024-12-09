@@ -58,6 +58,12 @@ autocmd("FileType", {
   command = "setlocal ts=2 sts=2 sw=2 expandtab",
 })
 
+-- typing ':' triggers re-indentation in rmd resulting in wrong indentation, so remove ':' from indentkeys
+autocmd("FileType", {
+  pattern = "rmd",
+  command = "setlocal indentkeys-=<:>", -- check with `set indentkeys?`, colon was represented by '<:>' not ':'
+})
+
 autocmd("FileType", {
   pattern = "sh",
   command = "setlocal ts=4 sts=4 sw=4 expandtab",
