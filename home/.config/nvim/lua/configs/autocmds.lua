@@ -90,3 +90,9 @@ autocmd("BufNewFile", {
   pattern = {"*.Rmd", "*.rmd"},
   command = "0r " .. template_path .. "template.Rmd",
 })
+
+-- quit Nvim-R before leaving vim, this is to trigger the .Last function call defined in .Rprofile
+autocmd("VimLeavePre", {
+  pattern = {"*.R", "*.r", "*.Rmd", "*.rmd"},
+  command = "call RQuit('nosave')",
+})
