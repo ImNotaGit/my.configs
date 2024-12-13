@@ -55,6 +55,16 @@ autocmd({"BufWinEnter", "WinEnter"}, {
   end,
 })
 
+-- R and Rmd
+autocmd("FileType", {
+  pattern = {"r", "rmd"},
+  callback = function()
+    vim.api.nvim_buf_set_keymap(0, "i", ".. ", " %>% ", { noremap =true })
+    vim.api.nvim_buf_set_keymap(0, "i", "..<CR>", " %>%<CR>", { noremap =true })
+    vim.api.nvim_buf_set_keymap(0, "i", "_ ", " <- ", { noremap =true })
+  end,
+})
+
 -- in Rmd, insert new code chunk or break current code chunk into two; the mapping behavior may change with different editor settings or plugins installed (?), so it could be non-robust...
 autocmd("FileType", {
   pattern = "rmd",
@@ -66,12 +76,22 @@ autocmd("FileType", {
   end,
 })
 
--- R and Rmd
+-- Rmd render selected lines
+autocmd("FileType", {
+  pattern = "rmd",
+  callback = function()
+    vim.api.nvim_buf_set_keymap(0, "v", "<LocalLeader>kk", "<Cmd>RdrSel<CR>", { noremap = true })
+    vim.api.nvim_buf_set_keymap(0, "n", "<LocalLeader>kk", "<Cmd>RdrSel<CR>", { noremap = true })
+    vim.api.nvim_buf_set_keymap(0, "i", "<LocalLeader>kk", "<Cmd>RdrSel<CR>", { noremap = true })
+  end,
+})
+
+-- R plot selected lines (this overwrites Nvim-R default <LocalLeader>pp)
 autocmd("FileType", {
   pattern = {"r", "rmd"},
   callback = function()
-    vim.api.nvim_buf_set_keymap(0, "i", ".. ", " %>% ", { noremap =true })
-    vim.api.nvim_buf_set_keymap(0, "i", "..<CR>", " %>%<CR>", { noremap =true })
-    vim.api.nvim_buf_set_keymap(0, "i", "_ ", " <- ", { noremap =true })
+    vim.api.nvim_buf_set_keymap(0, "v", "<LocalLeader>pp", "<Cmd>PltSel<CR>", { noremap = true })
+    vim.api.nvim_buf_set_keymap(0, "n", "<LocalLeader>pp", "<Cmd>PltSel<CR>", { noremap = true })
+    vim.api.nvim_buf_set_keymap(0, "i", "<LocalLeader>pp", "<Cmd>PltSel<CR>", { noremap = true })
   end,
 })
