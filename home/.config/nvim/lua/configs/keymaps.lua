@@ -55,6 +55,14 @@ autocmd({"BufWinEnter", "WinEnter"}, {
   end,
 })
 
+-- R terminal pipe; this should be only for R terminal but I could not figure it out... tried patterns term://*:R, term://*/*:R, term://*R, *:R, *R, didn't work
+autocmd({"BufWinEnter", "WinEnter"}, {
+  pattern = "term://*",
+  callback = function()
+    map("t", ".. ", " %>% ", { buffer = 0, noremap = true, desc = "R %>% pipe" })
+  end,
+})
+
 -- R and Rmd
 autocmd("FileType", {
   pattern = {"r", "rmd"},
